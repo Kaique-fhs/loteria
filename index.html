@@ -139,6 +139,30 @@
     .sete{padding:16px}
     .ball.sm{width:24px;height:24px;font-size:11px}
   }
+  [hidden]{display:none!important}
+  /* abas */
+  .tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;gap:6px;justify-content:center;overflow-x:auto;scrollbar-width:none;
+    width:fit-content;max-width:100%;margin:0 auto 20px;padding:8px;background:rgba(20,23,74,.92);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:99px}
+  .tabs::-webkit-scrollbar{display:none}
+  .tabs a{flex:none;padding:8px 16px;border-radius:99px;color:var(--cinza-claro);text-decoration:none;font-weight:600;font-size:15px;white-space:nowrap}
+  .tabs a:hover{color:#fff;background:rgba(199,195,189,.12)}
+  .tabs a[aria-current="page"]{background:var(--laranja);color:#fff}
+  .tabs a:focus-visible{outline:3px solid var(--laranja);outline-offset:2px}
+  body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+  .input-box{margin-top:0}
+  .quick{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-top:20px;background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:16px 20px}
+  .quick .ql{display:block;font-size:13px;color:var(--mut)}
+  .quick b{font-size:20px}
+  .quick .qs{display:block;font-size:13px;color:var(--laranja);font-weight:600}
+  .next{display:inline-block;margin-top:6px;padding:10px 18px;border-radius:99px;background:var(--laranja);color:#fff;text-decoration:none;font-weight:700}
+  .tab > .next{margin-top:20px}
+  .next:hover{filter:brightness(1.08)}
+  section.explain{grid-template-columns:minmax(0,1fr)!important;max-width:880px;margin-left:auto;margin-right:auto}
+  .explain p.sm{color:var(--mut);font-size:14px;margin-top:0}
+  .cart td:nth-child(2){font-variant-numeric:tabular-nums;white-space:nowrap}
+  .cart td.ok{color:var(--cinza-claro)} .cart td.bad{color:var(--laranja);font-weight:700}
+  .cart th,.cart td{text-align:left}
+  @media (max-width:520px){ .tabs{justify-content:flex-start;border-radius:14px} .tabs a{padding:7px 12px;font-size:14px} .quick{padding:14px} }
   .foot{margin-top:30px;color:var(--mut);font-size:13px;text-align:center}
 </style>
 </head>
@@ -147,11 +171,19 @@
   <header>
     <span class="tag">Mega da Virada 2027</span>
     <h1>Muitos jogos simples <span>ou</span> poucos jogos com mais números?</h1>
-    <p class="sub">Digite quanto você quer apostar. À esquerda, todo o valor vira jogos de 6 números. À direita, o mesmo valor vai para jogos com mais números. Compare as chances lado a lado.</p>
+    <p class="sub">Digite quanto você quer apostar e compare: todo o valor em jogos de 6 números, ou o mesmo valor em jogos com mais números.</p>
     <div class="prize">Prêmio estimado: R$ 1 bilhão · Aposta simples: R$ 6,00</div>
   </header>
 
-  <div class="input-box">
+  <nav class="tabs" aria-label="Seções">
+    <a href="#simulador" data-go="simulador">Simulador</a>
+    <a href="#comparacao" data-go="comparacao">Comparação</a>
+    <a href="#jogo-de-7" data-go="jogo-de-7">Jogo de 7</a>
+    <a href="#por-que" data-go="por-que">Por que é igual</a>
+    <a href="#precos" data-go="precos">Preços</a>
+  </nav>
+
+  <div class="input-box" id="inputBox">
     <label for="valor">Quanto você quer jogar?</label>
     <div class="money"><span>R$</span><input id="valor" type="text" inputmode="numeric" value="1.000"></div>
     <div class="chips">
@@ -161,6 +193,7 @@
     <div class="cfg">Preço da aposta simples (6 números): R$ <input id="preco" type="number" min="1" step="0.5" value="6"> · confira a tabela oficial da Caixa</div>
   </div>
 
+  <div class="tab" data-tab="simulador">
   <div class="grid">
     <div class="side l">
       <h2>⬅ Muitos jogos simples</h2>
@@ -176,7 +209,13 @@
       <div class="volantes" id="rVol"></div>
     </div>
   </div>
+  <div class="quick">
+    <div><span class="ql">Chance da sena</span><b id="qSena">—</b><span class="qs">igual nos dois lados</span></div>
+    <a class="next" href="#comparacao">Ver comparação completa →</a>
+  </div>
+  </div>
 
+  <div class="tab" data-tab="comparacao">
   <section class="compare">
     <h3>Comparação lado a lado</h3>
     <div class="tbl"><table class="ctab">
@@ -203,7 +242,10 @@
       <div><h4>💰 Se a sena sair para você</h4><div id="cPack"></div><div class="bars"><div class="bar l" id="bPl"></div><div class="bar r" id="bPr"></div></div><div class="lg">prêmios extras no mesmo bilhete</div></div>
     </div>
   </div>
+  <a class="next" href="#jogo-de-7">Entenda por que a sena empata →</a>
+  </div>
 
+  <div class="tab" data-tab="jogo-de-7">
   <section class="sete">
     <h3>Como um jogo de 7 números vira 7 jogos de 6</h3>
     <p class="lead">Um volante de 7 números cobre todas as combinações de 6 que dá para formar com eles, e são 7. Se as 6 dezenas sorteadas estiverem entre os seus 7 números, uma dessas combinações é exatamente o resultado. Por isso a Caixa cobra 7 × R$ 6 = <b>R$ 42</b>, e a chance divulgada para 7 números é <b>1 em 7.151.980</b>, que é 50.063.860 ÷ 7.</p>
@@ -229,22 +271,50 @@
       </div>
     </div>
   </section>
+  <a class="next" href="#por-que">E se eu escolher os números do meu jeito? →</a>
+  </div>
 
+  <div class="tab" data-tab="por-que">
   <section class="explain">
     <div class="box">
-      <h3>Por que a chance da sena é a mesma?</h3>
-      <p>Um jogo de 7 números equivale a <b>7 jogos de 6 números</b> (todas as combinações de 6 dentro dos 7). A Caixa cobra exatamente isso: 7 × R$ 6 = R$ 42.</p>
-      <p>Isso vale para qualquer tamanho: um jogo de <i>n</i> números cobre C(<i>n</i>,6) combinações e custa C(<i>n</i>,6) × R$ 6. Com o mesmo dinheiro você sempre compra o <b>mesmo número de combinações</b>, logo a mesma chance de acertar as 6 dezenas.</p>
-      <p>O que muda é a <b>distribuição</b>. Os jogos grandes compartilham números, então quando dão certo dão muito certo (vários prêmios juntos), e quando dão errado erram juntos. Os jogos simples espalham o risco, então têm mais chance de pegar <i>alguma</i> quadra ou quina, mas pagam menos quando a sena sai.</p>
+      <h3>Pense numa rifa</h3>
+      <p>A Mega é uma rifa com <b>50.063.860 bilhetes</b>, um para cada combinação de 6 números. O sorteio tira um bilhete só.</p>
+      <p>O volante de 7 números compra 7 bilhetes vizinhos, parecidos entre si, como os bilhetes 101 a 107. Sete jogos escolhidos do seu jeito compram 7 bilhetes espalhados, como os de números 8.302, 1.200.455 e 33.010.987. Nos dois casos você tem 7 bilhetes, e cada bilhete tem a mesma chance de ser o sorteado.</p>
+      <p>O volante parece ter uma folga, um número a mais para errar. Só que, para ganhar a sena, as 6 dezenas sorteadas precisam estar <b>todas</b> dentro dos seus 7, e isso acontece em apenas 7 dos 50 milhões de resultados. Essa folga custa R$ 42, o mesmo preço dos 7 jogos simples.</p>
     </div>
     <div class="box">
+      <h3>Escolher do seu jeito não atrapalha</h3>
+      <p>Se duas cartelas diferem em <b>pelo menos um número</b>, são duas combinações diferentes, e as chances se somam. Só a cartela repetida é dinheiro jogado fora.</p>
+      <div class="tbl"><table class="cart">
+        <thead><tr><th>Cartela</th><th>Números</th><th>Conta como</th></tr></thead>
+        <tbody>
+          <tr><td>A</td><td>05 · 12 · 23 · 34 · 45 · <b>51</b></td><td class="ok">1 combinação</td></tr>
+          <tr><td>B</td><td>05 · 12 · 23 · 34 · 45 · <b>58</b></td><td class="ok">outra combinação</td></tr>
+          <tr><td>C</td><td>05 · 12 · 23 · 34 · 45 · 51</td><td class="bad">repetida (igual à A)</td></tr>
+        </tbody>
+      </table></div>
+      <p>Com escolha aleatória, repetir é raríssimo: em 7 jogos, a chance de dois saírem iguais é de cerca de 1 em 2,4 milhões. Datas de aniversário, números da sorte ou jogos feitos por pessoas diferentes também não mudam a chance de acertar, desde que as cartelas não se repitam.</p>
+    </div>
+    <div class="box">
+      <h3>Qualquer tamanho de volante segue a mesma regra</h3>
+      <p>Um jogo de <i>n</i> números cobre C(<i>n</i>,6) combinações e custa C(<i>n</i>,6) × R$ 6. Com o mesmo dinheiro você sempre compra o <b>mesmo número de combinações</b>, logo a mesma chance de acertar as 6 dezenas.</p>
+      <p>O que muda é a <b>distribuição</b>. Os jogos grandes compartilham números, então quando dão certo dão muito certo (vários prêmios juntos), e quando dão errado erram juntos. Os jogos simples espalham o risco, então têm mais chance de pegar <i>alguma</i> quadra ou quina, mas pagam menos quando a sena sai.</p>
+    </div>
+  </section>
+  </div>
+
+  <div class="tab" data-tab="precos">
+  <section class="explain one">
+    <div class="box">
       <h3>Tabela de preços (aposta simples R$ <span id="tPreco">6</span>)</h3>
+      <p class="sm">Cada volante custa o número de combinações de 6 que ele cobre, vezes o preço da aposta simples. A linha destacada é o maior volante que cabe no valor do simulador.</p>
       <div class="tbl"><table>
         <thead><tr><th>Números</th><th>Combinações</th><th>Preço</th><th>Chance da sena</th></tr></thead>
         <tbody id="tabela"></tbody>
       </table></div>
     </div>
   </section>
+  </div>
 
   <p class="foot">Probabilidades calculadas sobre 50.063.860 combinações possíveis (C(60,6)). Na esquerda, consideramos jogos todos diferentes. Com mais de um jogo, as chances de "quina ou mais" e "algum prêmio" são aproximadas (jogos tratados como independentes). Valores de prêmio são estimativa; confira as regras e preços oficiais na Loterias Caixa. Jogue com responsabilidade.</p>
 </div>
@@ -293,6 +363,7 @@ function render(){
   $('lJogos').textContent = fmt(k);
   $('lComb').textContent = fmt(k);
   $("lSena").innerHTML = senaTxt(k);
+  $('qSena').textContent = k ? `${fmt(k)} em ${fmt(TOTAL)} (${pct(k/TOTAL)})` : '—';
   $('lQuina').innerHTML = umEm(lQuina);
   $('lQuadra').innerHTML = umEm(lQuadra);
   $('lPacote').innerHTML = k? '1 prêmio<small>1 sena</small>' : '—';
@@ -370,6 +441,18 @@ function render(){
     `<div class="jogo"><span class="n">Jogo ${i+1}</span>${nums.map(n=>`<span class="ball sm ${n===fora?'off':'on'}">${n}</span>`).join('')}</div>`
   ).join('');
 })();
+
+// abas: mostra a aba do endereço (#nome); o campo de valor só aparece no simulador e na comparação
+const TABS = ['simulador','comparacao','jogo-de-7','por-que','precos'];
+function showTab(){
+  const atual = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'simulador';
+  document.querySelectorAll('.tab').forEach(t=>{ t.hidden = t.dataset.tab !== atual; });
+  document.querySelectorAll('.tabs a').forEach(a=>{ if(a.dataset.go===atual) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
+  $('inputBox').hidden = !(atual==='simulador' || atual==='comparacao');
+  const ativo = document.querySelector('.tabs a[aria-current]'); if(ativo) ativo.scrollIntoView({block:'nearest',inline:'center'});
+}
+window.addEventListener('hashchange',()=>{ showTab(); const nav=document.querySelector('.tabs'); if(nav.getBoundingClientRect().top<0||window.scrollY>nav.offsetTop) window.scrollTo({top:nav.offsetTop-8}); });
+showTab();
 
 inp.addEventListener('input',()=>{ const v=parseValor(); inp.value = v? fmt(v):''; render(); });
 preco.addEventListener('input',render);
