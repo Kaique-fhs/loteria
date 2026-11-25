@@ -163,6 +163,56 @@
   .cart td.ok{color:var(--cinza-claro)} .cart td.bad{color:var(--laranja);font-weight:700}
   .cart th,.cart td{text-align:left}
   @media (max-width:520px){ .tabs{justify-content:flex-start;border-radius:14px} .tabs a{padding:7px 12px;font-size:14px} .quick{padding:14px} }
+  /* escolher números */
+  .aviso{background:rgba(255,105,52,.12);border:1px solid var(--laranja);border-radius:16px;padding:14px 18px;margin-bottom:18px;color:var(--txt)}
+  .esc-grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:20px;align-items:start}
+  .filtros,.meujogo,.res{background:var(--bg2);border:1px solid var(--line);border-radius:20px;padding:20px;min-width:0}
+  .filtros h3,.meujogo h3,.res h3{margin:0 0 12px;color:var(--laranja)}
+  .f{display:grid;gap:5px;margin-bottom:12px;font-size:14px;color:var(--cinza-claro)}
+  .f small{color:var(--cinza-escuro);font-size:12px}
+  .f select,.f input{font:inherit;font-size:15px;color:var(--txt);background:var(--deep);border:1px solid var(--line);border-radius:10px;padding:9px 10px;width:100%}
+  .chk{display:flex;gap:8px;align-items:flex-start;font-size:14px;margin-bottom:10px;color:var(--cinza-claro)}
+  .chk input{margin-top:3px;accent-color:var(--laranja)}
+  .acoes{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+  .acoes .next{border:0;cursor:pointer;font:inherit;font-weight:700;margin:0}
+  .ghost{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:99px;padding:10px 18px;font:inherit;cursor:pointer}
+  .msg{min-height:1.2em;font-size:14px;color:var(--laranja);margin:10px 0 0}
+  .volante{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;max-width:520px}
+  .volante button{aspect-ratio:1;border-radius:10px;border:1px solid var(--line);background:var(--deep);color:var(--cinza-claro);font:inherit;font-weight:700;font-size:14px;cursor:pointer;padding:0;font-variant-numeric:tabular-nums}
+  .volante button:hover{border-color:var(--laranja)}
+  .volante button.on{background:var(--laranja);border-color:var(--laranja);color:#fff}
+  .volante button.fixo{box-shadow:inset 0 0 0 2px #fff}
+  .escolhidos{margin:14px 0 4px;display:flex;flex-wrap:wrap;gap:6px;min-height:34px}
+  .analise{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:10px}
+  .analise .it{background:var(--deep);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+  .analise .it span{display:block;font-size:12px;color:var(--mut)}
+  .analise .it b{font-size:16px}
+  .analise .full{grid-column:1/-1}
+  .analise .it span.tagp,.tagp{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:700;margin:2px 4px 2px 0}
+  .tagp.alerta{background:rgba(255,105,52,.18);color:var(--laranja)} .tagp.okk{background:rgba(199,195,189,.15);color:var(--cinza-claro)}
+  .hist{font-size:13px;color:var(--cinza-claro);line-height:1.7}
+  .hist b{color:var(--txt)}
+  /* resultados */
+  .res + .res{margin-top:20px}
+  .res .sm{color:var(--mut);font-size:14px;margin-top:0;max-width:860px}
+  .rtab th,.rtab td{text-align:left;vertical-align:middle;padding:9px 8px}
+  .rtab td:nth-child(n+4),.rtab th:nth-child(n+4){text-align:right}
+  .rtab .bl{display:flex;gap:4px;flex-wrap:nowrap}
+  .rtab tr.top td{background:rgba(255,105,52,.10)}
+  .destaques{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:0 0 16px}
+  .destaques > div{background:var(--deep);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .destaques b{display:block;font-size:22px;color:var(--laranja)}
+  .destaques span{font-size:13px;color:var(--cinza-claro)}
+  .freqs{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px 24px;margin-top:8px}
+  .freq{display:grid;grid-template-columns:repeat(15,minmax(0,1fr));gap:3px;align-items:end;height:130px}
+  .freq .c{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;min-width:0}
+  .freq .b{width:100%;background:var(--cinza-claro);border-radius:3px 3px 0 0;min-height:2px}
+  .freq .c.mx .b{background:var(--laranja)}
+  .freq .n{font-size:9px;color:var(--mut);margin-top:3px;font-variant-numeric:tabular-nums}
+  .freq .v{font-size:9px;color:var(--cinza-claro);margin-bottom:2px}
+
+  @media (max-width:860px){ .esc-grid{grid-template-columns:minmax(0,1fr)} .destaques{grid-template-columns:minmax(0,1fr)} }
+  @media (max-width:520px){ .freqs{grid-template-columns:minmax(0,1fr)} .volante{gap:4px} .volante button{font-size:12px;border-radius:8px} .filtros,.meujogo,.res{padding:14px} }
   .foot{margin-top:30px;color:var(--mut);font-size:13px;text-align:center}
 </style>
 </head>
@@ -180,6 +230,8 @@
     <a href="#comparacao" data-go="comparacao">Comparação</a>
     <a href="#jogo-de-7" data-go="jogo-de-7">Jogo de 7</a>
     <a href="#por-que" data-go="por-que">Por que é igual</a>
+    <a href="#escolher" data-go="escolher">Escolher números</a>
+    <a href="#resultados" data-go="resultados">Resultados</a>
     <a href="#precos" data-go="precos">Preços</a>
   </nav>
 
@@ -300,6 +352,82 @@
       <p>Um jogo de <i>n</i> números cobre C(<i>n</i>,6) combinações e custa C(<i>n</i>,6) × R$ 6. Com o mesmo dinheiro você sempre compra o <b>mesmo número de combinações</b>, logo a mesma chance de acertar as 6 dezenas.</p>
       <p>O que muda é a <b>distribuição</b>. Os jogos grandes compartilham números, então quando dão certo dão muito certo (vários prêmios juntos), e quando dão errado erram juntos. Os jogos simples espalham o risco, então têm mais chance de pegar <i>alguma</i> quadra ou quina, mas pagam menos quando a sena sai.</p>
     </div>
+  </section>
+  </div>
+
+  <div class="tab" data-tab="escolher">
+  <div class="aviso">
+    <b>Antes de escolher:</b> nenhum filtro aumenta a chance de ganhar. Toda combinação tem 1 chance em 50.063.860, inclusive 1-2-3-4-5-6. Não existe número perfeito. O que um filtro pode fazer é <b>fugir dos padrões que muita gente joga</b>, para não ter que dividir o prêmio se você acertar.
+  </div>
+  <div class="esc-grid">
+    <form class="filtros" id="filtros" autocomplete="off">
+      <h3>Filtros</h3>
+      <label class="f">Quantos números no jogo
+        <select id="fQtd"></select>
+      </label>
+      <label class="f">Pares e ímpares
+        <select id="fPar">
+          <option value="qq">Qualquer</option>
+          <option value="eq">Equilibrado (metade de cada)</option>
+          <option value="mp">Mais pares</option>
+          <option value="mi">Mais ímpares</option>
+          <option value="sp">Só pares</option>
+          <option value="si">Só ímpares</option>
+        </select>
+      </label>
+      <label class="f">Números primos
+        <select id="fPrimo">
+          <option value="qq">Qualquer</option>
+          <option value="0">Nenhum primo</option>
+          <option value="ate2">No máximo 2</option>
+          <option value="min2">Pelo menos 2</option>
+          <option value="so">Só primos</option>
+        </select>
+        <small>Primos até 60: 2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59</small>
+      </label>
+      <label class="f">Data de nascimento
+        <input id="fData" type="text" inputmode="numeric" placeholder="dd/mm/aaaa">
+        <small>Entram o dia, o mês e, se couber entre 1 e 60, o ano com dois dígitos.</small>
+      </label>
+      <label class="f">Números que devem entrar
+        <input id="fFixo" type="text" inputmode="numeric" placeholder="ex.: 7, 13, 42">
+      </label>
+      <label class="f">Números que não podem entrar
+        <input id="fFora" type="text" inputmode="numeric" placeholder="ex.: 1, 2, 3">
+      </label>
+      <label class="chk"><input id="fAcima" type="checkbox" checked> Fugir das datas: pelo menos 2 números acima de 31</label>
+      <label class="chk"><input id="fSeq" type="checkbox" checked> Evitar 3 ou mais números seguidos (ex.: 10, 11, 12)</label>
+      <div class="acoes">
+        <button type="submit" class="next">Gerar jogo</button>
+        <button type="button" class="ghost" id="fLimpar">Limpar</button>
+      </div>
+      <p class="msg" id="fMsg" role="status"></p>
+    </form>
+
+    <div class="meujogo">
+      <h3>Seu jogo</h3>
+      <p class="sm">Toque nos números para marcar ou desmarcar, ou gere um jogo com os filtros.</p>
+      <div class="volante" id="volante" role="group" aria-label="Volante de 1 a 60"></div>
+      <div class="escolhidos" id="escolhidos"></div>
+      <div class="analise" id="analise"></div>
+    </div>
+  </div>
+  </div>
+
+  <div class="tab" data-tab="resultados">
+  <section class="res">
+    <h3>Todas as Megas da Virada</h3>
+    <p class="sm">Fonte: API oficial de resultados da Caixa, consultada em 25/11/2026 e conferida com uma segunda fonte (Wikipedia). As dezenas e o número de ganhadores batem nas duas fontes. A edição de 2025 foi sorteada em 01/01/2026. Para 2008 a Caixa não informa a arrecadação.</p>
+    <div class="destaques" id="destaques"></div>
+    <div class="tbl"><table class="rtab">
+      <thead><tr><th>Ano</th><th>Concurso</th><th>Dezenas</th><th>Ganhadores da sena</th><th>Prêmio por ganhador</th><th>Arrecadação</th></tr></thead>
+      <tbody id="rBody"></tbody>
+    </table></div>
+  </section>
+  <section class="res">
+    <h3>Quantas vezes cada número saiu nas Viradas</h3>
+    <p class="sm">São só <span id="nSort">18</span> sorteios, pouco para qualquer conclusão. O sorteio não tem memória: um número que saiu muito ou nunca saiu tem a mesma chance no próximo.</p>
+    <div class="freqs" id="freq"></div>
   </section>
   </div>
 
@@ -443,7 +571,7 @@ function render(){
 })();
 
 // abas: mostra a aba do endereço (#nome); o campo de valor só aparece no simulador e na comparação
-const TABS = ['simulador','comparacao','jogo-de-7','por-que','precos'];
+const TABS = ['simulador','comparacao','jogo-de-7','por-que','escolher','resultados','precos'];
 function showTab(){
   const atual = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'simulador';
   document.querySelectorAll('.tab').forEach(t=>{ t.hidden = t.dataset.tab !== atual; });
@@ -459,5 +587,7 @@ preco.addEventListener('input',render);
 document.querySelectorAll('.chips button').forEach(b=>b.onclick=()=>{ inp.value=fmt(+b.dataset.v); render(); });
 render();
 </script>
+<script src="dados/viradas.js"></script>
+<script src="escolher.js"></script>
 </body>
 </html>
