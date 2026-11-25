@@ -156,6 +156,46 @@
   .quick .qs{display:block;font-size:13px;color:var(--laranja);font-weight:600}
   .next{display:inline-block;margin-top:6px;padding:10px 18px;border-radius:99px;background:var(--laranja);color:#fff;text-decoration:none;font-weight:700}
   .tab > .next{margin-top:20px}
+  /* simulador + comparação numa tela só */
+  header{margin-bottom:14px}
+  header .tag{font-size:11px;padding:2px 10px}
+  h1{font-size:clamp(24px,3vw,34px);margin:8px 0 4px}
+  .sub{font-size:14px}
+  .prize{margin-top:4px;font-size:14px}
+  .tabs{margin-bottom:14px;padding:6px}
+  .tabs a{padding:6px 14px;font-size:14px}
+  .wrap{padding-block:18px 60px}
+  .sim{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:16px;align-items:start}
+  .sim .input-box{margin:0 0 12px;padding:14px 16px;max-width:none}
+  .sim .money span{font-size:24px} .sim .money input{font-size:26px;padding:4px 10px}
+  .sim .chips{margin-top:10px;gap:6px} .sim .chips button{padding:4px 10px;font-size:13px}
+  .sim .cfg{margin-top:8px;font-size:12px}
+  .sim .grid{grid-template-columns:minmax(0,1fr);gap:12px}
+  .sim .side{padding:12px 16px} .sim .side h2{font-size:17px}
+  .sim .side .desc{margin-bottom:4px;font-size:13px}
+  .sim .big{font-size:28px;display:inline-block;margin-right:6px}
+  .sim .tickets,.sim .volantes{display:none}
+  .sim .compare{margin-top:0;padding:14px 16px}
+  .sim .compare h3{margin-bottom:6px}
+  .sim .ctab th,.sim .ctab td{padding:6px 8px;font-size:14px}
+  .sim .ctab td small{font-size:11.5px}
+  .sim .verdict{margin:12px 0 0;padding:14px 18px}
+  .sim .verdict h3{font-size:13px}
+  .sim .verdict .eq{font-size:clamp(22px,2.6vw,30px)}
+  .sim .verdict p{font-size:14px;margin-top:4px}
+  @media (max-width:960px){ .sim{grid-template-columns:minmax(0,1fr)} }
+  [data-tab=simulador] .side{padding:16px 18px}
+  [data-tab=simulador] .side .desc{margin-bottom:6px}
+  [data-tab=simulador] .big{font-size:32px}
+  [data-tab=simulador] .tickets,[data-tab=simulador] .volantes{margin:8px 0 0;min-height:0}
+  [data-tab=simulador] .compare{margin-top:16px;padding:16px 18px}
+  [data-tab=simulador] .ctab th,[data-tab=simulador] .ctab td{padding:7px 8px}
+  [data-tab=simulador] .verdict{margin:16px 0;padding:18px}
+  [data-tab=simulador] .cmp{margin-top:12px}
+  .input-box{padding:16px 22px;margin-bottom:16px}
+  .opt-nota{font-size:12px;color:var(--cinza-escuro);margin:-4px 0 10px}
+  .acoes .next:disabled{opacity:.45;cursor:not-allowed;filter:none}
+  .chk.bloq{opacity:.5}
   .next:hover{filter:brightness(1.08)}
   section.explain{grid-template-columns:minmax(0,1fr)!important;max-width:880px;margin-left:auto;margin-right:auto}
   .explain p.sm{color:var(--mut);font-size:14px;margin-top:0}
@@ -227,7 +267,6 @@
 
   <nav class="tabs" aria-label="Seções">
     <a href="#simulador" data-go="simulador">Simulador</a>
-    <a href="#comparacao" data-go="comparacao">Comparação</a>
     <a href="#jogo-de-7" data-go="jogo-de-7">Jogo de 7</a>
     <a href="#por-que" data-go="por-que">Por que é igual</a>
     <a href="#escolher" data-go="escolher">Escolher números</a>
@@ -235,6 +274,9 @@
     <a href="#precos" data-go="precos">Preços</a>
   </nav>
 
+  <div class="tab" data-tab="simulador">
+  <div class="sim">
+  <div class="sim-esq">
   <div class="input-box" id="inputBox">
     <label for="valor">Quanto você quer jogar?</label>
     <div class="money"><span>R$</span><input id="valor" type="text" inputmode="numeric" value="1.000"></div>
@@ -244,30 +286,23 @@
     </div>
     <div class="cfg">Preço da aposta simples (6 números): R$ <input id="preco" type="number" min="1" step="0.5" value="6"> · confira a tabela oficial da Caixa</div>
   </div>
-
-  <div class="tab" data-tab="simulador">
   <div class="grid">
     <div class="side l">
-      <h2>⬅ Muitos jogos simples</h2>
+      <h2>Muitos jogos simples</h2>
       <div class="desc">Todo o valor em jogos de 6 números</div>
       <div class="big" id="lJogos">0</div><small style="color:var(--mut)">jogos de 6 números</small>
       <div class="tickets" id="lTickets"></div>
     </div>
 
     <div class="side r">
-      <h2>Poucos jogos com mais números ➡</h2>
+      <h2>Poucos jogos com mais números</h2>
       <div class="desc">O mesmo valor concentrado nos maiores jogos possíveis</div>
       <div class="big" id="rJogos">0</div><small style="color:var(--mut)" id="rDesc">jogos</small>
       <div class="volantes" id="rVol"></div>
     </div>
   </div>
-  <div class="quick">
-    <div><span class="ql">Chance da sena</span><b id="qSena">—</b><span class="qs">igual nos dois lados</span></div>
-    <a class="next" href="#comparacao">Ver comparação completa →</a>
   </div>
-  </div>
-
-  <div class="tab" data-tab="comparacao">
+  <div class="sim-dir">
   <section class="compare">
     <h3>Comparação lado a lado</h3>
     <div class="tbl"><table class="ctab">
@@ -285,14 +320,11 @@
   </section>
 
   <div class="verdict">
-    <h3>Quantas chances a mais na direita?</h3>
+    <h3>Chance da sena: quanto a direita ganha a mais?</h3>
     <div class="eq" id="vMain">—</div>
     <p id="vText"></p>
-    <div class="cmp">
-      <div><h4>🎯 Sena (o bilhão)</h4><div id="cSena"></div><div class="bars"><div class="bar l" id="bSl"></div><div class="bar r" id="bSr"></div></div><div class="lg">cinza = esquerda · laranja = direita</div></div>
-      <div><h4>🎟️ Ganhar algum prêmio</h4><div id="cAny"></div><div class="bars"><div class="bar l" id="bAl"></div><div class="bar r" id="bAr"></div></div><div class="lg">chance de quadra ou mais</div></div>
-      <div><h4>💰 Se a sena sair para você</h4><div id="cPack"></div><div class="bars"><div class="bar l" id="bPl"></div><div class="bar r" id="bPr"></div></div><div class="lg">prêmios extras no mesmo bilhete</div></div>
-    </div>
+  </div>
+  </div>
   </div>
   <a class="next" href="#jogo-de-7">Entenda por que a sena empata →</a>
   </div>
@@ -395,10 +427,11 @@
       <label class="f">Números que não podem entrar
         <input id="fFora" type="text" inputmode="numeric" placeholder="ex.: 1, 2, 3">
       </label>
-      <label class="chk"><input id="fAcima" type="checkbox" checked> Fugir das datas: pelo menos 2 números acima de 31</label>
-      <label class="chk"><input id="fSeq" type="checkbox" checked> Evitar 3 ou mais números seguidos (ex.: 10, 11, 12)</label>
+      <p class="opt-nota" id="fNota" hidden>Opções apagadas não são possíveis junto com os outros filtros.</p>
+      <label class="chk" id="lAcima"><input id="fAcima" type="checkbox" checked> Fugir das datas: pelo menos 2 números acima de 31</label>
+      <label class="chk" id="lSeq"><input id="fSeq" type="checkbox" checked> Evitar 3 ou mais números seguidos (ex.: 10, 11, 12)</label>
       <div class="acoes">
-        <button type="submit" class="next">Gerar jogo</button>
+        <button type="submit" class="next" id="fGerar">Gerar jogo</button>
         <button type="button" class="ghost" id="fLimpar">Limpar</button>
       </div>
       <p class="msg" id="fMsg" role="status"></p>
@@ -491,13 +524,12 @@ function render(){
   $('lJogos').textContent = fmt(k);
   $('lComb').textContent = fmt(k);
   $("lSena").innerHTML = senaTxt(k);
-  $('qSena').textContent = k ? `${fmt(k)} em ${fmt(TOTAL)} (${pct(k/TOTAL)})` : '—';
   $('lQuina').innerHTML = umEm(lQuina);
   $('lQuadra').innerHTML = umEm(lQuadra);
   $('lPacote').innerHTML = k? '1 prêmio<small>1 sena</small>' : '—';
   $('lTroco').textContent = brl(V - k*P);
   const tk = $('lTickets'); tk.innerHTML='';
-  const show = Math.min(k,120);
+  const show = Math.min(k,60);
   for(let i=0;i<show;i++){ const d=document.createElement('div'); d.className='tk'; d.style.animationDelay=(i*4)+'ms'; tk.appendChild(d); }
   if(k>show){ const m=document.createElement('span'); m.className='more'; m.textContent='+ '+fmt(k-show)+' jogos'; tk.appendChild(m); }
 
@@ -533,13 +565,13 @@ function render(){
   $('dTroco').innerHTML = '<span class="tie">Igual</span>';
 
   const vol = $('rVol'); vol.innerHTML='';
-  bets.slice(0,8).forEach((n,i)=>{
+  bets.slice(0,4).forEach((n,i)=>{
     const nums = new Set(); while(nums.size<n) nums.add(1+Math.floor(Math.random()*60));
     let g=''; for(let x=1;x<=60;x++) g+=`<i class="${nums.has(x)?'on':''}"></i>`;
     const el=document.createElement('div'); el.className='vol'; el.style.animationDelay=(i*60)+'ms';
     el.innerHTML=`<div class="t">${n} números</div><div class="g">${g}</div>`; vol.appendChild(el);
   });
-  if(bets.length>8){ const m=document.createElement('span'); m.className='more'; m.textContent='+ '+fmt(bets.length-8)+' jogos'; vol.appendChild(m); }
+  if(bets.length>4){ const m=document.createElement('span'); m.className='more'; m.textContent='+ '+fmt(bets.length-4)+' jogos'; vol.appendChild(m); }
 
   // VEREDITO
   if(!k){ $('vMain').textContent='Digite um valor a partir de '+brl(P); $('vText').textContent=''; }
@@ -548,12 +580,6 @@ function render(){
     $('vMain').innerHTML = Math.abs(diff)<1e-6 ? '0% — <span class="win">a chance da sena é a mesma</span>' : (diff>0?'+':'')+diff.toFixed(1)+'%';
     $('vText').innerHTML = `Com ${brl(V)} você cobre <b>${fmt(k)}</b> combinações dos dois jeitos. O que muda é o resto: a esquerda tem mais chance de ganhar <i>algum</i> prêmio, e a direita, se acertar a sena, leva também ${fmt(quinas)} quinas e ${fmt(quadras)} quadras no mesmo bilhete.`;
   }
-  $('cSena').innerHTML = `Esq.: <b>${senaTxt(k)}</b><br>Dir.: <b>${senaTxt(rComb)}</b>`;
-  $('cAny').innerHTML = `Esq.: <b>${umEm(lQuadra)}</b><br>Dir.: <b>${umEm(rQuadra)}</b>` + (lQuadra>rQuadra*1.001 ? `<br><span class="win">Esquerda ${(lQuadra/rQuadra).toFixed(2).replace('.',',')}× mais</span>`:'');
-  const lp = k?1:0, rp = nMax? 1+quinas+quadras : 0;
-  $('cPack').innerHTML = `Esq.: <b>1 sena</b><br>Dir.: <b>${fmt(rp)} prêmios</b>` + (rp>1?`<br><span class="win">Direita leva ${fmt(rp)}× mais prêmios</span>`:'');
-  const bar=(a,b,el1,el2)=>{ const m=Math.max(a,b)||1; $(el1).style.width=(a/m*100)+'%'; $(el2).style.width=(b/m*100)+'%'; };
-  bar(lSena,rSena,'bSl','bSr'); bar(lQuadra,rQuadra,'bAl','bAr'); bar(lp,rp,'bPl','bPr');
 
   // TABELA
   let t=''; const nm = nMax;
@@ -570,13 +596,14 @@ function render(){
   ).join('');
 })();
 
-// abas: mostra a aba do endereço (#nome); o campo de valor só aparece no simulador e na comparação
-const TABS = ['simulador','comparacao','jogo-de-7','por-que','escolher','resultados','precos'];
+// abas: mostra a aba do endereço (#nome); o campo de valor só aparece no simulador
+const TABS = ['simulador','jogo-de-7','por-que','escolher','resultados','precos'];
 function showTab(){
-  const atual = TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'simulador';
+  const h = location.hash.slice(1);
+  const atual = TABS.includes(h) ? h : 'simulador';  // #comparacao antigo cai no simulador
   document.querySelectorAll('.tab').forEach(t=>{ t.hidden = t.dataset.tab !== atual; });
   document.querySelectorAll('.tabs a').forEach(a=>{ if(a.dataset.go===atual) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
-  $('inputBox').hidden = !(atual==='simulador' || atual==='comparacao');
+  $('inputBox').hidden = atual!=='simulador';
   const ativo = document.querySelector('.tabs a[aria-current]'); if(ativo) ativo.scrollIntoView({block:'nearest',inline:'center'});
 }
 window.addEventListener('hashchange',()=>{ showTab(); const nav=document.querySelector('.tabs'); if(nav.getBoundingClientRect().top<0||window.scrollY>nav.offsetTop) window.scrollTo({top:nav.offsetTop-8}); });

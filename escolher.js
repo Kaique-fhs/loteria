@@ -25,64 +25,132 @@ function maiorSequencia(arr){
   for(let i=1;i<s.length;i++){ cur = s[i]===s[i-1]+1 ? cur+1 : 1; best = Math.max(best,cur); }
   return best;
 }
-function embaralhar(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
 
 // ---------- regras dos filtros ----------
-function cumpre(jogo, f){
-  const n = jogo.length;
-  const pares = jogo.filter(x => x%2===0).length, impares = n - pares;
-  const primos = jogo.filter(x => PRIMOS.has(x)).length;
-  switch(f.par){
-    case 'eq': if(Math.abs(pares-impares) > 1) return false; break;
-    case 'mp': if(pares <= impares) return false; break;
-    case 'mi': if(impares <= pares) return false; break;
-    case 'sp': if(impares) return false; break;
-    case 'si': if(pares) return false; break;
+// Contador exato: quantos jogos atendem a todos os filtros juntos.
+// Percorre os números de 1 a 60 decidindo "entra" ou "fica de fora", guardando só o que os
+// filtros ativos precisam (quantidade, pares, primos, números acima de 31, sequência atual).
+// Total 0 = combinação impossível. Também sorteia um jogo uniforme entre os válidos.
+const MEMO = new Float64Array(61*16*16*4*3*3);
+
+function lerFiltros(over){
+  return Object.assign({ qtd: +$('fQtd').value, par: $('fPar').value, primo: $('fPrimo').value,
+    acima: $('fAcima').checked, seq: $('fSeq').checked }, over || {});
+}
+function lerNumeros(){
+  const data = numsDaData($('fData').value);
+  const fora = new Set(lerLista($('fFora').value));
+  const obrig = [...new Set([...lerLista($('fFixo').value), ...data.nums])];
+  return { data, fora, obrig };
+}
+
+function resolver(f, obrig, fora){
+  const forcado = new Uint8Array(61), pode = new Uint8Array(61);
+  obrig.forEach(n => forcado[n] = 1);
+  for(let n=1;n<=60;n++){
+    let ok = !fora.has(n);
+    if(f.par === 'sp' && n%2) ok = false;
+    if(f.par === 'si' && !(n%2)) ok = false;
+    if(f.primo === 'so' && !PRIMOS.has(n)) ok = false;
+    if(f.primo === '0' && PRIMOS.has(n)) ok = false;
+    pode[n] = ok ? 1 : 0;
   }
-  switch(f.primo){
-    case '0': if(primos) return false; break;
-    case 'ate2': if(primos > 2) return false; break;
-    case 'min2': if(primos < 2) return false; break;
-    case 'so': if(primos !== n) return false; break;
+  const usaPar = ['eq','mp','mi'].includes(f.par), usaPrimo = f.primo === 'ate2' || f.primo === 'min2';
+  MEMO.fill(-1);
+  const chave = (i,k,ev,pr,ac,run) => ((((i*16+k)*16+ev)*4+pr)*3+ac)*3+run;
+  function fim(k,ev,pr,ac){
+    if(k !== f.qtd) return 0;
+    const od = k - ev;
+    if(f.par === 'eq' && Math.abs(ev-od) > 1) return 0;
+    if(f.par === 'mp' && ev <= od) return 0;
+    if(f.par === 'mi' && od <= ev) return 0;
+    if(f.primo === 'ate2' && pr > 2) return 0;
+    if(f.primo === 'min2' && pr < 2) return 0;
+    if(f.acima && ac < 2) return 0;
+    return 1;
   }
-  if(f.acima && jogo.filter(x => x > 31).length < 2) return false;
-  if(f.seq && maiorSequencia(jogo) >= 3) return false;
-  return true;
+  function pula(i,k,ev,pr,ac){ return forcado[i] ? 0 : w(i+1,k,ev,pr,ac,0); }
+  function pega(i,k,ev,pr,ac,run){
+    if(!pode[i] || k >= f.qtd || (f.seq && run >= 2)) return 0;
+    return w(i+1, k+1, usaPar ? ev + (i%2===0) : 0, usaPrimo ? Math.min(3, pr + PRIMOS.has(i)) : 0,
+      f.acima ? Math.min(2, ac + (i>31)) : 0, f.seq ? run+1 : 0);
+  }
+  function w(i,k,ev,pr,ac,run){
+    if(i > 60) return fim(k,ev,pr,ac);
+    const id = chave(i,k,ev,pr,ac,run);
+    if(MEMO[id] >= 0) return MEMO[id];
+    return MEMO[id] = pula(i,k,ev,pr,ac) + pega(i,k,ev,pr,ac,run);
+  }
+  const total = w(1,0,0,0,0,0);
+  return {
+    total,
+    sortear(){
+      const jogo = []; let k=0, ev=0, pr=0, ac=0, run=0;
+      for(let i=1;i<=60;i++){
+        const wp = pega(i,k,ev,pr,ac,run), ws = pula(i,k,ev,pr,ac);
+        if(Math.random()*(wp+ws) < wp){
+          jogo.push(i); k++;
+          if(usaPar) ev += (i%2===0);
+          if(usaPrimo) pr = Math.min(3, pr + PRIMOS.has(i));
+          if(f.acima) ac = Math.min(2, ac + (i>31));
+          if(f.seq) run++;
+        } else run = 0;
+      }
+      return jogo;
+    }
+  };
+}
+
+// Por que não dá: mensagem para o usuário quando o total é zero.
+function motivo(f, nums){
+  const { data, fora, obrig } = nums;
+  if(data.erro) return data.erro;
+  const conflito = obrig.filter(n => fora.has(n));
+  if(conflito.length) return `O número ${conflito.join(', ')} está em "devem entrar" e em "não podem entrar".`;
+  if(obrig.length > f.qtd) return `Você fixou ${obrig.length} números, mais do que os ${f.qtd} do jogo. Aumente a quantidade ou tire algum.`;
+  return 'Os números fixos ou excluídos não combinam com os filtros escolhidos. Mude os números ou algum filtro.';
+}
+
+// Apaga as opções que levariam a uma combinação impossível.
+function atualizarBloqueios(){
+  const nums = lerNumeros(), base = lerFiltros();
+  const viavel = over => !nums.data.erro && resolver(lerFiltros(over), nums.obrig, nums.fora).total > 0;
+  let algumBloqueado = false;
+  [['fQtd','qtd',Number],['fPar','par',String],['fPrimo','primo',String]].forEach(([id,campo,conv]) => {
+    const sel = $(id);
+    [...sel.options].forEach(o => {
+      if(!o.dataset.t) o.dataset.t = o.textContent;
+      const ok = o.value === sel.value || viavel({ [campo]: conv(o.value) });
+      o.disabled = !ok;
+      o.textContent = o.dataset.t + (ok ? '' : ' (impossível)');
+      if(!ok) algumBloqueado = true;
+    });
+  });
+  [['fAcima','lAcima','acima'],['fSeq','lSeq','seq']].forEach(([id,lab,campo]) => {
+    const cb = $(id);
+    const ok = cb.checked || viavel({ [campo]: true });
+    cb.disabled = !ok; $(lab).classList.toggle('bloq', !ok);
+    $(lab).title = ok ? '' : 'Impossível junto com os outros filtros';
+    if(!ok) algumBloqueado = true;
+  });
+  $('fNota').hidden = !algumBloqueado;
+  const atual = !nums.data.erro && resolver(base, nums.obrig, nums.fora).total > 0;
+  $('fGerar').disabled = !atual;
+  if(!atual) $('fMsg').textContent = motivo(base, nums);
+  else if($('fMsg').dataset.bloq) $('fMsg').textContent = '';
+  $('fMsg').dataset.bloq = atual ? '' : '1';
+  return atual;
 }
 
 function gerar(e){
   if(e) e.preventDefault();
-  const msg = $('fMsg'); msg.textContent = '';
-  const qtd = +$('fQtd').value;
-  const data = numsDaData($('fData').value);
-  if(data.erro){ msg.textContent = data.erro; return; }
-  const fora = new Set(lerLista($('fFora').value));
-  const obrig = [...new Set([...lerLista($('fFixo').value), ...data.nums])];
-  const conflito = obrig.filter(n => fora.has(n));
-  if(conflito.length){ msg.textContent = `O número ${conflito.join(', ')} está em "devem entrar" e em "não podem entrar".`; return; }
-  if(obrig.length > qtd){ msg.textContent = `Você fixou ${obrig.length} números, mais do que os ${qtd} do jogo. Aumente a quantidade ou tire algum.`; return; }
-  const f = { par: $('fPar').value, primo: $('fPrimo').value, acima: $('fAcima').checked, seq: $('fSeq').checked };
-  const livres = []; for(let n=1;n<=60;n++) if(!fora.has(n) && !obrig.includes(n)) livres.push(n);
-  if(livres.length < qtd - obrig.length){ msg.textContent = 'Sobraram poucos números livres. Tire alguns de "não podem entrar".'; return; }
-
-  // filtros "só pares/ímpares/primos" e "nenhum primo" restringem os candidatos antes de sortear
-  let cand = livres;
-  if(f.par === 'sp') cand = cand.filter(x => x%2===0);
-  if(f.par === 'si') cand = cand.filter(x => x%2===1);
-  if(f.primo === 'so') cand = cand.filter(x => PRIMOS.has(x));
-  if(f.primo === '0') cand = cand.filter(x => !PRIMOS.has(x));
-  if(cand.length < qtd - obrig.length){ msg.textContent = 'Com esses filtros não há números suficientes para o jogo. Diminua a quantidade de números ou afrouxe algum filtro.'; return; }
-
-  for(let t=0;t<40000;t++){
-    const jogo = obrig.concat(embaralhar(cand.slice()).slice(0, qtd - obrig.length));
-    if(cumpre(jogo, f)){
-      escolha = new Set(jogo); fixos = new Set(obrig);
-      desenharVolante(); analisar();
-      msg.textContent = data.nums.length ? `Da data entraram: ${data.nums.join(', ')}.` : '';
-      return;
-    }
-  }
-  msg.textContent = 'Não achei um jogo que atenda a todos os filtros juntos. Afrouxe algum deles (por exemplo, pares ou primos).';
+  const msg = $('fMsg');
+  if(!atualizarBloqueios()) return;
+  const f = lerFiltros(), nums = lerNumeros();
+  const jogo = resolver(f, nums.obrig, nums.fora).sortear();
+  escolha = new Set(jogo); fixos = new Set(nums.obrig);
+  desenharVolante(); analisar();
+  msg.textContent = nums.data.nums.length ? `Da data entraram: ${nums.data.nums.join(', ')}.` : '';
 }
 
 // ---------- volante e análise ----------
@@ -152,7 +220,7 @@ function limpar(){
   escolha = new Set(); fixos = new Set();
   ['fData','fFixo','fFora'].forEach(id => $(id).value = '');
   $('fPar').value = 'qq'; $('fPrimo').value = 'qq'; $('fMsg').textContent = '';
-  desenharVolante(); analisar();
+  atualizarBloqueios(); desenharVolante(); analisar();
 }
 
 // ---------- aba Resultados ----------
@@ -199,5 +267,10 @@ function desenharResultados(){
   for(let n=6;n<=15;n++){ const o=document.createElement('option'); o.value=n; o.textContent=`${n} números · ${brl(C(n,6)*PRECO_SIMPLES())}`; sel.appendChild(o); }
   $('filtros').addEventListener('submit', gerar);
   $('fLimpar').addEventListener('click', limpar);
+  $('filtros').addEventListener('change', atualizarBloqueios);
+  let espera; $('filtros').addEventListener('input', ev => {
+    if(ev.target.tagName !== 'INPUT' || ev.target.type === 'checkbox') return;
+    clearTimeout(espera); espera = setTimeout(atualizarBloqueios, 250);
+  });
   desenharVolante(); gerar(); desenharResultados();
 })();
