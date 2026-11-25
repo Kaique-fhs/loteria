@@ -83,7 +83,7 @@
   .verdict p{color:var(--mut);max-width:780px;margin:8px auto 0}
   .cmp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:20px;text-align:left}
   @media (max-width:860px){.cmp{grid-template-columns:minmax(0,1fr)}}
-  .cmp div{background:var(--deep);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .cmp > div{background:var(--deep);border:1px solid var(--line);border-radius:14px;padding:14px}
   .cmp h4{margin:0 0 6px;font-size:15px}
   .bars{margin-top:8px}
   .bar{height:12px;border-radius:6px;margin:4px 0;transition:width .5s}
@@ -100,6 +100,19 @@
   th:first-child,td:first-child{text-align:left}
   th{color:var(--mut);font-weight:600}
   tr.hl td{color:var(--right);font-weight:700}
+  .compare{margin-top:24px;background:var(--bg2);border:1px solid var(--line);border-radius:20px;padding:20px}
+  .compare h3{margin:0 0 12px;color:var(--laranja)}
+  .ctab{min-width:0;table-layout:fixed}
+  @media (max-width:520px){ .compare{padding:14px 10px} .ctab th,.ctab td{padding:8px 3px;font-size:12px} .ctab td small{font-size:10.5px} .ctab th:first-child,.ctab td:first-child{width:26%} }
+  .ctab th,.ctab td{text-align:center;vertical-align:middle;padding:10px 8px}
+  .ctab th:first-child,.ctab td:first-child{text-align:left;color:var(--mut);width:28%}
+  .ctab th.hl-l{color:var(--left)} .ctab th.hl-r{color:var(--right)}
+  .ctab td{font-weight:700;font-size:15px}
+  .ctab td small{display:block;font-weight:400;color:var(--mut);font-size:12px}
+  .ctab td:last-child{font-weight:600}
+  .ctab tr.key td{background:rgba(255,105,52,.10)}
+  .cmp small{display:block;color:var(--mut);font-weight:400}
+  .tie{color:var(--cinza-claro)} .gl{color:var(--left)} .gr{color:var(--right)}
   .foot{margin-top:30px;color:var(--mut);font-size:13px;text-align:center}
 </style>
 </head>
@@ -128,12 +141,6 @@
       <div class="desc">Todo o valor em jogos de 6 números</div>
       <div class="big" id="lJogos">0</div><small style="color:var(--mut)">jogos de 6 números</small>
       <div class="tickets" id="lTickets"></div>
-      <div class="stat"><small>Combinações cobertas</small><b id="lComb">0</b></div>
-      <div class="stat"><small>Chance de acertar a sena</small><b id="lSena">—</b></div>
-      <div class="stat"><small>Chance de quina ou mais</small><b id="lQuina">—</b></div>
-      <div class="stat"><small>Chance de algum prêmio (quadra+)</small><b id="lQuadra">—</b></div>
-      <div class="stat"><small>Se acertar a sena, leva junto</small><b id="lPacote">—</b></div>
-      <div class="stat"><small>Troco (não dá para apostar)</small><b id="lTroco">—</b></div>
     </div>
 
     <div class="side r">
@@ -141,21 +148,31 @@
       <div class="desc">O mesmo valor concentrado nos maiores jogos possíveis</div>
       <div class="big" id="rJogos">0</div><small style="color:var(--mut)" id="rDesc">jogos</small>
       <div class="volantes" id="rVol"></div>
-      <div class="stat"><small>Combinações cobertas</small><b id="rComb">0</b></div>
-      <div class="stat"><small>Chance de acertar a sena</small><b id="rSena">—</b></div>
-      <div class="stat"><small>Chance de quina ou mais</small><b id="rQuina">—</b></div>
-      <div class="stat"><small>Chance de algum prêmio (quadra+)</small><b id="rQuadra">—</b></div>
-      <div class="stat"><small>Se acertar a sena, leva junto</small><b id="rPacote">—</b></div>
-      <div class="stat"><small>Troco (não dá para apostar)</small><b id="rTroco">—</b></div>
     </div>
   </div>
+
+  <section class="compare">
+    <h3>Comparação lado a lado</h3>
+    <div class="tbl"><table class="ctab">
+      <thead><tr><th>Com o mesmo valor</th><th class="hl-l">Muitos jogos simples</th><th class="hl-r">Poucos jogos com mais números</th><th>Diferença</th></tr></thead>
+      <tbody>
+        <tr><td>Jogos feitos</td><td id="tJl">—</td><td id="tJr">—</td><td id="tJd">—</td></tr>
+        <tr><td>Combinações cobertas</td><td id="lComb">—</td><td id="rComb">—</td><td id="dComb">—</td></tr>
+        <tr class="key"><td>Chance de acertar a sena</td><td id="lSena">—</td><td id="rSena">—</td><td id="dSena">—</td></tr>
+        <tr><td>Chance de quina ou mais</td><td id="lQuina">—</td><td id="rQuina">—</td><td id="dQuina">—</td></tr>
+        <tr><td>Chance de algum prêmio (quadra ou mais)</td><td id="lQuadra">—</td><td id="rQuadra">—</td><td id="dQuadra">—</td></tr>
+        <tr><td>Se acertar a sena, leva junto</td><td id="lPacote">—</td><td id="rPacote">—</td><td id="dPacote">—</td></tr>
+        <tr><td>Troco (não dá para apostar)</td><td id="lTroco">—</td><td id="rTroco">—</td><td id="dTroco">—</td></tr>
+      </tbody>
+    </table></div>
+  </section>
 
   <div class="verdict">
     <h3>Quantas chances a mais na direita?</h3>
     <div class="eq" id="vMain">—</div>
     <p id="vText"></p>
     <div class="cmp">
-      <div><h4>🎯 Sena (o bilhão)</h4><div id="cSena"></div><div class="bars"><div class="bar l" id="bSl"></div><div class="bar r" id="bSr"></div></div><div class="lg">azul = esquerda · verde = direita</div></div>
+      <div><h4>🎯 Sena (o bilhão)</h4><div id="cSena"></div><div class="bars"><div class="bar l" id="bSl"></div><div class="bar r" id="bSr"></div></div><div class="lg">cinza = esquerda · laranja = direita</div></div>
       <div><h4>🎟️ Ganhar algum prêmio</h4><div id="cAny"></div><div class="bars"><div class="bar l" id="bAl"></div><div class="bar r" id="bAr"></div></div><div class="lg">chance de quadra ou mais</div></div>
       <div><h4>💰 Se a sena sair para você</h4><div id="cPack"></div><div class="bars"><div class="bar l" id="bPl"></div><div class="bar r" id="bPr"></div></div><div class="lg">prêmios extras no mesmo bilhete</div></div>
     </div>
@@ -186,8 +203,18 @@ const C = (n,k)=>{ if(k<0||k>n) return 0; let r=1; for(let i=1;i<=k;i++) r=r*(n-
 const fmt = n => n.toLocaleString('pt-BR');
 const brl = n => n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const pct = p => (p*100).toLocaleString("pt-BR",{maximumSignificantDigits:3})+"%";
-const umEm = p => p<=0 ? "—" : (p>=1 ? "100%" : pct(p) + " · 1 em " + fmt(Math.round(1/p)));
-const senaTxt = c => c<=0 ? "—" : fmt(c) + " em " + fmt(TOTAL) + " · " + pct(c/TOTAL);
+const umEm = p => p<=0 ? "—" : (p>=1 ? "100%" : pct(p) + "<small>1 em " + fmt(Math.round(1/p)) + "</small>");
+const senaTxt = c => c<=0 ? "—" : fmt(c) + " em " + fmt(TOTAL) + "<small>" + pct(c/TOTAL) + "</small>";
+const x = r => r.toLocaleString("pt-BR",{maximumFractionDigits:1}) + "×";
+// texto da coluna Diferença: quem tem o maior valor e quantas vezes
+function dif(l, r, menorMelhor){
+  if(!l && !r) return "—";
+  if(Math.abs(l-r) <= 1e-12*Math.max(l,r,1)) return '<span class="tie">Igual</span>';
+  const esq = menorMelhor ? l<r : l>r;
+  const razao = Math.max(l,r)/Math.min(l,r);
+  const lado = esq ? '<span class="gl">Esquerda</span>' : '<span class="gr">Direita</span>';
+  return isFinite(razao) ? `${lado} ${x(razao)} maior` : lado;
+}
 
 // probabilidades de um jogo de n números
 function probs(n){
@@ -213,10 +240,10 @@ function render(){
   const lQuadra = 1-Math.pow(1-p6.quadra,k);
   $('lJogos').textContent = fmt(k);
   $('lComb').textContent = fmt(k);
-  $("lSena").textContent = senaTxt(k);
-  $('lQuina').textContent = umEm(lQuina);
-  $('lQuadra').textContent = umEm(lQuadra);
-  $('lPacote').textContent = k? '1 sena' : '—';
+  $("lSena").innerHTML = senaTxt(k);
+  $('lQuina').innerHTML = umEm(lQuina);
+  $('lQuadra').innerHTML = umEm(lQuadra);
+  $('lPacote').innerHTML = k? '1 prêmio<small>1 sena</small>' : '—';
   $('lTroco').textContent = brl(V - k*P);
   const tk = $('lTickets'); tk.innerHTML='';
   const show = Math.min(k,120);
@@ -235,13 +262,24 @@ function render(){
   $('rJogos').textContent = fmt(bets.length);
   $('rDesc').textContent = bets.length ? (bets.length===1?'jogo':'jogos')+': '+desc : 'jogos';
   $('rComb').textContent = fmt(rComb);
-  $("rSena").textContent = senaTxt(rComb);
-  $('rQuina').textContent = umEm(rQuina);
-  $('rQuadra').textContent = umEm(rQuadra);
+  $("rSena").innerHTML = senaTxt(rComb);
+  $('rQuina').innerHTML = umEm(rQuina);
+  $('rQuadra').innerHTML = umEm(rQuadra);
   const nMax = bets.length? bets[0] : 0;
   const quinas = nMax? 6*(nMax-6) : 0, quadras = nMax? 15*C(nMax-6,2) : 0;
-  $('rPacote').textContent = nMax ? `1 sena + ${fmt(quinas)} quinas + ${fmt(quadras)} quadras` : '—';
+  $('rPacote').innerHTML = nMax ? `${fmt(1+quinas+quadras)} prêmios<small>1 sena + ${fmt(quinas)} quinas + ${fmt(quadras)} quadras</small>` : '—';
   $('rTroco').textContent = brl(rem);
+
+  // coluna Diferença e linha de jogos
+  $('tJl').innerHTML = fmt(k) + '<small>de 6 números</small>';
+  $('tJr').innerHTML = fmt(bets.length) + (nMax ? `<small>o maior com ${nMax} números</small>` : '');
+  $('tJd').innerHTML = k ? (k===bets.length ? '<span class="tie">Igual</span>' : `<span class="tie">${fmt(k-bets.length)} jogos a menos na direita</span>`) : '—';
+  $('dComb').innerHTML = dif(k, rComb);
+  $('dSena').innerHTML = k ? '<span class="tie">Igual · 0% a mais</span>' : '—';
+  $('dQuina').innerHTML = dif(lQuina, rQuina);
+  $('dQuadra').innerHTML = dif(lQuadra, rQuadra);
+  $('dPacote').innerHTML = k ? dif(1, 1+quinas+quadras).replace('maior','mais prêmios') : '—';
+  $('dTroco').innerHTML = '<span class="tie">Igual</span>';
 
   const vol = $('rVol'); vol.innerHTML='';
   bets.slice(0,8).forEach((n,i)=>{
