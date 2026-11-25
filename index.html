@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Um bilhete grande ou vários pequenos?</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+  @font-face{font-family:"Supreme";src:url("fonts/Supreme-Variable.woff2") format("woff2");font-weight:100 800;font-style:normal;font-display:swap}
+  /* Paleta SIAN: Azul Naval (fundo), Laranja Elétrico (destaque), Cinza Claro e Cinza Escuro (apoio).
+     Tons mais escuros do Azul Naval para cartões são derivação, não constam no manual. */
+  :root{
+    --azul:#24286E; --laranja:#FF6934; --cinza-escuro:#94958B; --cinza-claro:#C7C3BD;
+    --bg:#24286E; --bg2:#1d2160; --card:#1a1d57; --deep:#14174a; --line:rgba(199,195,189,.28);
+    --txt:#ffffff; --mut:#C7C3BD; --gold:#FF6934; --gold2:#FF6934;
+    --left:#C7C3BD; --right:#FF6934; --warn:#FF6934;
+    color-scheme:dark;
+  }
+  @media (prefers-reduced-motion: reduce){ *{animation:none!important;transition:none!important} }
+  .tbl{overflow-x:auto}
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;font-family:"Supreme",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:
+    radial-gradient(1200px 600px at 50% -200px,#2f3486 0%,transparent 70%),var(--bg);color:var(--txt);line-height:1.5}
+  h1,h2,h3{text-wrap:balance}
+  .big,b,td{font-variant-numeric:tabular-nums}
+  button:focus-visible,input:focus-visible{outline:3px solid var(--laranja);outline-offset:2px}
+  @media (max-width:520px){
+    .money span{font-size:24px}
+    .money input{font-size:26px}
+    .big{font-size:32px}
+    .stat{flex-wrap:wrap}
+    .stat b{white-space:normal;font-size:16px}
+    .side,.verdict,.box{padding:16px}
+    th,td{padding:5px 4px;font-size:13px}
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding-block:32px 80px;padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+  .side,.box{min-width:0}
+  header{text-align:center;margin-bottom:28px}
+  .tag{display:inline-block;padding:4px 12px;border:1px solid var(--gold);color:var(--gold);border-radius:99px;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+  h1{font-size:clamp(28px,4.4vw,46px);margin:14px 0 8px;line-height:1.15}
+  h1 span{color:var(--gold)}
+  .sub{color:var(--mut);max-width:760px;margin:0 auto}
+  .prize{margin-top:10px;color:var(--gold2);font-weight:600}
+
+  .input-box{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:22px;margin:26px auto;max-width:760px;text-align:center}
+  .input-box label{display:block;color:var(--mut);margin-bottom:8px}
+  .money{display:flex;max-width:100%;align-items:center;justify-content:center;gap:8px}
+  .money span{font-size:30px;color:var(--gold);font-weight:700}
+  .money input{width:min(340px,100%);min-width:0;font-size:34px;font-weight:700;text-align:center;background:var(--deep);border:2px solid var(--gold);color:var(--txt);border-radius:12px;padding:8px 12px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:14px}
+  .chips button{background:transparent;border:1px solid var(--line);color:var(--txt);padding:6px 14px;border-radius:99px;cursor:pointer;font-size:14px}
+  .chips button:hover{border-color:var(--gold);color:var(--gold)}
+  .cfg{margin-top:12px;font-size:13px;color:var(--mut)}
+  .cfg input{width:70px;background:var(--deep);border:1px solid var(--line);color:var(--txt);border-radius:6px;padding:2px 6px}
+
+  .grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+  @media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+  .side{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px;position:relative;overflow:hidden}
+  .side::before{content:"";position:absolute;inset:0 0 auto 0;height:4px}
+  .side.l::before{background:var(--left)} .side.r::before{background:var(--right)}
+  .side h2{margin:0 0 2px;font-size:21px}
+  .side.l h2{color:var(--left)} .side.r h2{color:var(--right)}
+  .side .desc{color:var(--mut);font-size:14px;margin-bottom:14px}
+  .big{font-size:40px;font-weight:800;line-height:1}
+  .stat{display:flex;justify-content:space-between;align-items:baseline;padding:10px 0;border-top:1px dashed var(--line);gap:10px}
+  .stat b{font-size:18px;white-space:nowrap}
+  .stat small{color:var(--mut)}
+  .tickets{display:flex;flex-wrap:wrap;gap:4px;margin:12px 0 6px;min-height:40px}
+  .tk{width:16px;height:22px;border-radius:3px;background:var(--left);opacity:.85;animation:pop .35s ease both}
+  .more{color:var(--mut);font-size:13px;align-self:center;margin-left:6px}
+  @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
+  .volantes{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 6px}
+  .vol{background:var(--deep);border:1px solid var(--line);border-radius:8px;padding:6px;animation:pop .35s ease both}
+  .vol .t{font-size:11px;color:var(--right);text-align:center;margin-bottom:3px;font-weight:700}
+  .vol .g{display:grid;grid-template-columns:repeat(10,8px);gap:2px}
+  .vol .g i{width:8px;height:8px;border-radius:2px;background:rgba(199,195,189,.18)}
+  .vol .g i.on{background:var(--laranja)}
+
+  .verdict{margin:24px 0;background:linear-gradient(135deg,#2f3486,var(--card));border:2px solid var(--gold);border-radius:22px;padding:26px;text-align:center}
+  .verdict h3{margin:0 0 6px;color:var(--gold);font-size:15px;text-transform:uppercase;letter-spacing:.08em}
+  .verdict .eq{font-size:clamp(30px,5vw,52px);font-weight:900}
+  .verdict p{color:var(--mut);max-width:780px;margin:8px auto 0}
+  .cmp{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:20px;text-align:left}
+  @media (max-width:860px){.cmp{grid-template-columns:minmax(0,1fr)}}
+  .cmp div{background:var(--deep);border:1px solid var(--line);border-radius:14px;padding:14px}
+  .cmp h4{margin:0 0 6px;font-size:15px}
+  .bars{margin-top:8px}
+  .bar{height:12px;border-radius:6px;margin:4px 0;transition:width .5s}
+  .bar.l{background:var(--left)} .bar.r{background:var(--right)}
+  .lg{font-size:12px;color:var(--mut)}
+  .win{color:var(--gold2);font-weight:700}
+
+  section.explain{margin-top:34px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+  @media (max-width:860px){section.explain{grid-template-columns:minmax(0,1fr)}}
+  .box{background:var(--bg2);border:1px solid var(--line);border-radius:18px;padding:20px}
+  .box h3{margin-top:0;color:var(--gold)}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right}
+  th:first-child,td:first-child{text-align:left}
+  th{color:var(--mut);font-weight:600}
+  tr.hl td{color:var(--right);font-weight:700}
+  .foot{margin-top:30px;color:var(--mut);font-size:13px;text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <span class="tag">Mega da Virada 2027</span>
+    <h1>Muitos jogos simples <span>ou</span> poucos jogos com mais números?</h1>
+    <p class="sub">Digite quanto você quer apostar. À esquerda, todo o valor vira jogos de 6 números. À direita, o mesmo valor vai para jogos com mais números. Compare as chances lado a lado.</p>
+    <div class="prize">Prêmio estimado: R$ 1 bilhão · Aposta simples: R$ 6,00</div>
+  </header>
+
+  <div class="input-box">
+    <label for="valor">Quanto você quer jogar?</label>
+    <div class="money"><span>R$</span><input id="valor" type="text" inputmode="numeric" value="1.000"></div>
+    <div class="chips">
+      <button data-v="42">R$ 42</button><button data-v="100">R$ 100</button><button data-v="504">R$ 504</button>
+      <button data-v="1000">R$ 1.000</button><button data-v="5544">R$ 5.544</button><button data-v="30030">R$ 30.030</button><button data-v="250000">R$ 250.000</button>
+    </div>
+    <div class="cfg">Preço da aposta simples (6 números): R$ <input id="preco" type="number" min="1" step="0.5" value="6"> · confira a tabela oficial da Caixa</div>
+  </div>
+
+  <div class="grid">
+    <div class="side l">
+      <h2>⬅ Muitos jogos simples</h2>
+      <div class="desc">Todo o valor em jogos de 6 números</div>
+      <div class="big" id="lJogos">0</div><small style="color:var(--mut)">jogos de 6 números</small>
+      <div class="tickets" id="lTickets"></div>
+      <div class="stat"><small>Combinações cobertas</small><b id="lComb">0</b></div>
+      <div class="stat"><small>Chance de acertar a sena</small><b id="lSena">—</b></div>
+      <div class="stat"><small>Chance de quina ou mais</small><b id="lQuina">—</b></div>
+      <div class="stat"><small>Chance de algum prêmio (quadra+)</small><b id="lQuadra">—</b></div>
+      <div class="stat"><small>Se acertar a sena, leva junto</small><b id="lPacote">—</b></div>
+      <div class="stat"><small>Troco (não dá para apostar)</small><b id="lTroco">—</b></div>
+    </div>
+
+    <div class="side r">
+      <h2>Poucos jogos com mais números ➡</h2>
+      <div class="desc">O mesmo valor concentrado nos maiores jogos possíveis</div>
+      <div class="big" id="rJogos">0</div><small style="color:var(--mut)" id="rDesc">jogos</small>
+      <div class="volantes" id="rVol"></div>
+      <div class="stat"><small>Combinações cobertas</small><b id="rComb">0</b></div>
+      <div class="stat"><small>Chance de acertar a sena</small><b id="rSena">—</b></div>
+      <div class="stat"><small>Chance de quina ou mais</small><b id="rQuina">—</b></div>
+      <div class="stat"><small>Chance de algum prêmio (quadra+)</small><b id="rQuadra">—</b></div>
+      <div class="stat"><small>Se acertar a sena, leva junto</small><b id="rPacote">—</b></div>
+      <div class="stat"><small>Troco (não dá para apostar)</small><b id="rTroco">—</b></div>
+    </div>
+  </div>
+
+  <div class="verdict">
+    <h3>Quantas chances a mais na direita?</h3>
+    <div class="eq" id="vMain">—</div>
+    <p id="vText"></p>
+    <div class="cmp">
+      <div><h4>🎯 Sena (o bilhão)</h4><div id="cSena"></div><div class="bars"><div class="bar l" id="bSl"></div><div class="bar r" id="bSr"></div></div><div class="lg">azul = esquerda · verde = direita</div></div>
+      <div><h4>🎟️ Ganhar algum prêmio</h4><div id="cAny"></div><div class="bars"><div class="bar l" id="bAl"></div><div class="bar r" id="bAr"></div></div><div class="lg">chance de quadra ou mais</div></div>
+      <div><h4>💰 Se a sena sair para você</h4><div id="cPack"></div><div class="bars"><div class="bar l" id="bPl"></div><div class="bar r" id="bPr"></div></div><div class="lg">prêmios extras no mesmo bilhete</div></div>
+    </div>
+  </div>
+
+  <section class="explain">
+    <div class="box">
+      <h3>Por que a chance da sena é a mesma?</h3>
+      <p>Um jogo de 7 números equivale a <b>7 jogos de 6 números</b> (todas as combinações de 6 dentro dos 7). A Caixa cobra exatamente isso: 7 × R$ 6 = R$ 42.</p>
+      <p>Isso vale para qualquer tamanho: um jogo de <i>n</i> números cobre C(<i>n</i>,6) combinações e custa C(<i>n</i>,6) × R$ 6. Com o mesmo dinheiro você sempre compra o <b>mesmo número de combinações</b>, logo a mesma chance de acertar as 6 dezenas.</p>
+      <p>O que muda é a <b>distribuição</b>. Os jogos grandes compartilham números, então quando dão certo dão muito certo (vários prêmios juntos), e quando dão errado erram juntos. Os jogos simples espalham o risco, então têm mais chance de pegar <i>alguma</i> quadra ou quina, mas pagam menos quando a sena sai.</p>
+    </div>
+    <div class="box">
+      <h3>Tabela de preços (aposta simples R$ <span id="tPreco">6</span>)</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>Números</th><th>Combinações</th><th>Preço</th><th>Chance da sena</th></tr></thead>
+        <tbody id="tabela"></tbody>
+      </table></div>
+    </div>
+  </section>
+
+  <p class="foot">Probabilidades calculadas sobre 50.063.860 combinações possíveis (C(60,6)). Na esquerda, consideramos jogos todos diferentes. Com mais de um jogo, as chances de "quina ou mais" e "algum prêmio" são aproximadas (jogos tratados como independentes). Valores de prêmio são estimativa; confira as regras e preços oficiais na Loterias Caixa. Jogue com responsabilidade.</p>
+</div>
+
+<script>
+const TOTAL = 50063860;
+const C = (n,k)=>{ if(k<0||k>n) return 0; let r=1; for(let i=1;i<=k;i++) r=r*(n-k+i)/i; return Math.round(r); };
+const fmt = n => n.toLocaleString('pt-BR');
+const brl = n => n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+const pct = p => (p*100).toLocaleString("pt-BR",{maximumSignificantDigits:3})+"%";
+const umEm = p => p<=0 ? "—" : (p>=1 ? "100%" : pct(p) + " · 1 em " + fmt(Math.round(1/p)));
+const senaTxt = c => c<=0 ? "—" : fmt(c) + " em " + fmt(TOTAL) + " · " + pct(c/TOTAL);
+
+// probabilidades de um jogo de n números
+function probs(n){
+  const s=C(n,6), q=C(n,5)*(60-n), d=C(n,4)*C(60-n,2);
+  return { sena:s/TOTAL, quina:(s+q)/TOTAL, quadra:(s+q+d)/TOTAL };
+}
+const atLeastOne = list => 1 - list.reduce((acc,p)=>acc*(1-p),1);
+
+const $ = id => document.getElementById(id);
+const inp = $('valor'), preco = $('preco');
+
+function parseValor(){ const v = parseInt(inp.value.replace(/\D/g,''),10); return isNaN(v)?0:Math.min(v, 50000000); }
+
+function render(){
+  const V = parseValor(), P = Math.max(0.5, parseFloat(preco.value)||6);
+  $('tPreco').textContent = P.toLocaleString('pt-BR',{minimumFractionDigits:2});
+
+  // ESQUERDA
+  const k = Math.floor(V/P);
+  const p6 = probs(6);
+  const lSena = Math.min(1,k/TOTAL);
+  const lQuina = 1-Math.pow(1-p6.quina,k);
+  const lQuadra = 1-Math.pow(1-p6.quadra,k);
+  $('lJogos').textContent = fmt(k);
+  $('lComb').textContent = fmt(k);
+  $("lSena").textContent = senaTxt(k);
+  $('lQuina').textContent = umEm(lQuina);
+  $('lQuadra').textContent = umEm(lQuadra);
+  $('lPacote').textContent = k? '1 sena' : '—';
+  $('lTroco').textContent = brl(V - k*P);
+  const tk = $('lTickets'); tk.innerHTML='';
+  const show = Math.min(k,120);
+  for(let i=0;i<show;i++){ const d=document.createElement('div'); d.className='tk'; d.style.animationDelay=(i*4)+'ms'; tk.appendChild(d); }
+  if(k>show){ const m=document.createElement('span'); m.className='more'; m.textContent='+ '+fmt(k-show)+' jogos'; tk.appendChild(m); }
+
+  // DIREITA: guloso, maior jogo possível primeiro
+  let rem = V; const bets=[];
+  for(let n=20;n>=6;n--){ const pr=C(n,6)*P; while(pr<=rem+1e-9){ bets.push(n); rem-=pr; if(bets.length>100000) break; } }
+  const rComb = bets.reduce((a,n)=>a+C(n,6),0);
+  const rSena = Math.min(1,rComb/TOTAL);
+  const rQuina = atLeastOne(bets.map(n=>probs(n).quina));
+  const rQuadra = atLeastOne(bets.map(n=>probs(n).quadra));
+  const counts = {}; bets.forEach(n=>counts[n]=(counts[n]||0)+1);
+  const desc = Object.keys(counts).sort((a,b)=>b-a).map(n=>`${fmt(counts[n])}× de ${n} números`).join(' + ');
+  $('rJogos').textContent = fmt(bets.length);
+  $('rDesc').textContent = bets.length ? (bets.length===1?'jogo':'jogos')+': '+desc : 'jogos';
+  $('rComb').textContent = fmt(rComb);
+  $("rSena").textContent = senaTxt(rComb);
+  $('rQuina').textContent = umEm(rQuina);
+  $('rQuadra').textContent = umEm(rQuadra);
+  const nMax = bets.length? bets[0] : 0;
+  const quinas = nMax? 6*(nMax-6) : 0, quadras = nMax? 15*C(nMax-6,2) : 0;
+  $('rPacote').textContent = nMax ? `1 sena + ${fmt(quinas)} quinas + ${fmt(quadras)} quadras` : '—';
+  $('rTroco').textContent = brl(rem);
+
+  const vol = $('rVol'); vol.innerHTML='';
+  bets.slice(0,8).forEach((n,i)=>{
+    const nums = new Set(); while(nums.size<n) nums.add(1+Math.floor(Math.random()*60));
+    let g=''; for(let x=1;x<=60;x++) g+=`<i class="${nums.has(x)?'on':''}"></i>`;
+    const el=document.createElement('div'); el.className='vol'; el.style.animationDelay=(i*60)+'ms';
+    el.innerHTML=`<div class="t">${n} números</div><div class="g">${g}</div>`; vol.appendChild(el);
+  });
+  if(bets.length>8){ const m=document.createElement('span'); m.className='more'; m.textContent='+ '+fmt(bets.length-8)+' jogos'; vol.appendChild(m); }
+
+  // VEREDITO
+  if(!k){ $('vMain').textContent='Digite um valor a partir de '+brl(P); $('vText').textContent=''; }
+  else {
+    const diff = (rSena/lSena-1)*100;
+    $('vMain').innerHTML = Math.abs(diff)<1e-6 ? '0% — <span class="win">a chance da sena é a mesma</span>' : (diff>0?'+':'')+diff.toFixed(1)+'%';
+    $('vText').innerHTML = `Com ${brl(V)} você cobre <b>${fmt(k)}</b> combinações dos dois jeitos. O que muda é o resto: a esquerda tem mais chance de ganhar <i>algum</i> prêmio, e a direita, se acertar a sena, leva também ${fmt(quinas)} quinas e ${fmt(quadras)} quadras no mesmo bilhete.`;
+  }
+  $('cSena').innerHTML = `Esq.: <b>${senaTxt(k)}</b><br>Dir.: <b>${senaTxt(rComb)}</b>`;
+  $('cAny').innerHTML = `Esq.: <b>${umEm(lQuadra)}</b><br>Dir.: <b>${umEm(rQuadra)}</b>` + (lQuadra>rQuadra*1.001 ? `<br><span class="win">Esquerda ${(lQuadra/rQuadra).toFixed(2).replace('.',',')}× mais</span>`:'');
+  const lp = k?1:0, rp = nMax? 1+quinas+quadras : 0;
+  $('cPack').innerHTML = `Esq.: <b>1 sena</b><br>Dir.: <b>${fmt(rp)} prêmios</b>` + (rp>1?`<br><span class="win">Direita leva ${fmt(rp)}× mais prêmios</span>`:'');
+  const bar=(a,b,el1,el2)=>{ const m=Math.max(a,b)||1; $(el1).style.width=(a/m*100)+'%'; $(el2).style.width=(b/m*100)+'%'; };
+  bar(lSena,rSena,'bSl','bSr'); bar(lQuadra,rQuadra,'bAl','bAr'); bar(lp,rp,'bPl','bPr');
+
+  // TABELA
+  let t=''; const nm = nMax;
+  for(let n=6;n<=20;n++){ const c=C(n,6); t+=`<tr class="${n===nm?'hl':''}"><td>${n}</td><td>${fmt(c)}</td><td>${brl(c*P)}</td><td>${pct(c/TOTAL)}</td></tr>`; }
+  $('tabela').innerHTML=t;
+}
+
+inp.addEventListener('input',()=>{ const v=parseValor(); inp.value = v? fmt(v):''; render(); });
+preco.addEventListener('input',render);
+document.querySelectorAll('.chips button').forEach(b=>b.onclick=()=>{ inp.value=fmt(+b.dataset.v); render(); });
+render();
+</script>
+</body>
+</html>
