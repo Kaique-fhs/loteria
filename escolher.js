@@ -134,7 +134,9 @@ function atualizarBloqueios(){
     if(!ok) algumBloqueado = true;
   });
   $('fNota').hidden = !algumBloqueado;
-  const atual = !nums.data.erro && resolver(base, nums.obrig, nums.fora).total > 0;
+  const total = nums.data.erro ? 0 : resolver(base, nums.obrig, nums.fora).total;
+  const atual = total > 0;
+  mostrarConta(total, base.qtd);
   $('fGerar').disabled = !atual;
   if(!atual) $('fMsg').textContent = motivo(base, nums);
   else if($('fMsg').dataset.bloq) $('fMsg').textContent = '';
@@ -142,8 +144,26 @@ function atualizarBloqueios(){
   return atual;
 }
 
+// Quantos jogos existem com os filtros: só aparece depois que a pessoa mexe em algum filtro.
+let filtrou = false;
+function mostrarConta(total, qtd){
+  const el = $('fConta');
+  if(!filtrou){ el.hidden = true; return; }
+  el.hidden = false;
+  if(!total){ el.innerHTML = '<b>0 jogos possíveis</b><span>Nenhum jogo atende a essa combinação.</span>'; return; }
+  const todos = C(60, qtd);
+  el.innerHTML = `<b>${fmt(Math.round(total))} ${total === 1 ? 'jogo possível' : 'jogos possíveis'}</b>`
+    + `<span>com esses filtros, de ${fmt(todos)} jogos de ${qtd} números (${pct(total/todos)}).</span>`;
+}
+
+// Mudou um filtro: atualiza bloqueios e contagem e sugere um jogo na cartela.
+function aoFiltrar(){
+  filtrou = true;
+  if(atualizarBloqueios()) gerar();
+}
+
 function gerar(e){
-  if(e) e.preventDefault();
+  if(e){ e.preventDefault(); filtrou = true; }
   const msg = $('fMsg');
   if(!atualizarBloqueios()) return;
   const f = lerFiltros(), nums = lerNumeros();
@@ -220,7 +240,7 @@ function limpar(){
   escolha = new Set(); fixos = new Set();
   ['fData','fFixo','fFora'].forEach(id => $(id).value = '');
   $('fPar').value = 'qq'; $('fPrimo').value = 'qq'; $('fMsg').textContent = '';
-  atualizarBloqueios(); desenharVolante(); analisar();
+  filtrou = false; atualizarBloqueios(); desenharVolante(); analisar();
 }
 
 // ---------- aba Resultados ----------
@@ -267,10 +287,10 @@ function desenharResultados(){
   for(let n=6;n<=15;n++){ const o=document.createElement('option'); o.value=n; o.textContent=`${n} números · ${brl(C(n,6)*PRECO_SIMPLES())}`; sel.appendChild(o); }
   $('filtros').addEventListener('submit', gerar);
   $('fLimpar').addEventListener('click', limpar);
-  $('filtros').addEventListener('change', atualizarBloqueios);
+  $('filtros').addEventListener('change', aoFiltrar);
   let espera; $('filtros').addEventListener('input', ev => {
     if(ev.target.tagName !== 'INPUT' || ev.target.type === 'checkbox') return;
-    clearTimeout(espera); espera = setTimeout(atualizarBloqueios, 250);
+    clearTimeout(espera); espera = setTimeout(aoFiltrar, 400);
   });
-  desenharVolante(); gerar(); desenharResultados();
+  atualizarBloqueios(); desenharVolante(); analisar(); desenharResultados();
 })();
